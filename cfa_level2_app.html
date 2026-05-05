@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CFA L2">
+<title>CFA Level II — Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0a1628; --navy2:#0f2044; --navy3:#142554;
+  --blue:#1a4fa0; --blue2:#2563c7; --sky:#3b8ee8; --skylight:#7ab8f5;
+  --accent:#fbbf24; --accent2:#f59e0b;
+  --white:#f8faff; --muted:#8ba4c8; --muted2:#5a7aa8;
+  --card:rgba(255,255,255,0.055); --card2:rgba(255,255,255,0.1);
+  --border:rgba(255,255,255,0.1); --border2:rgba(255,255,255,0.18);
+  --success:#22d3a0; --danger:#f87171; --purple:#a78bfa;
+  --r:16px; --rs:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--navy);
+  color:var(--white);
+  position:relative;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 100% 60% at 50% -10%,rgba(37,99,199,0.4) 0%,transparent 65%),
+    radial-gradient(ellipse 50% 40% at 90% 80%,rgba(59,142,232,0.12) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 30% at 10% 60%,rgba(26,79,160,0.1) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+/* ===== ROUTER ===== */
+.page{display:none;position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;z-index:10;
+  background:var(--navy);padding-bottom:80px;}
+.page.active{display:block;}
+.page::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 100% 60% at 50% -10%,rgba(37,99,199,0.4) 0%,transparent 65%);
+  pointer-events:none;z-index:-1;
+}
+
+/* ===== NAV ===== */
+.nav-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(10,22,40,0.96);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;align-items:center;
+  padding:10px 0 max(16px,env(safe-area-inset-bottom));
+  z-index:200;
+}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:6px 12px;border-radius:var(--rs);
+  transition:all 0.2s;flex:1;
+}
+.nav-item.active .nav-ico,.nav-item.active .nav-lbl{color:var(--accent);}
+.nav-ico{font-size:20px;color:var(--muted);transition:all 0.2s;}
+.nav-lbl{font-size:9px;color:var(--muted);font-weight:600;letter-spacing:0.8px;text-transform:uppercase;}
+
+/* ===== LAYOUT ===== */
+.wrap{max-width:480px;margin:0 auto;padding:0 16px;}
+.hdr{padding:52px 0 18px;}
+.hdr-eyebrow{font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+.hdr-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;line-height:1.1;}
+.hdr-title span{color:var(--skylight);}
+.hdr-sub{font-size:13px;color:var(--muted);margin-top:6px;}
+
+/* ===== CARDS ===== */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:16px;margin-bottom:14px;
+  backdrop-filter:blur(10px);
+}
+.card-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;font-weight:600;}
+.sep{height:1px;background:var(--border);margin:12px 0;}
+
+/* ===== QUOTE ===== */
+.quote-card{
+  background:linear-gradient(135deg,rgba(37,99,199,0.35),rgba(59,142,232,0.15));
+  border:1px solid rgba(59,142,232,0.25);border-radius:var(--r);
+  padding:20px;margin-bottom:14px;position:relative;overflow:hidden;
+}
+.quote-card::before{
+  content:'"';position:absolute;top:-12px;left:10px;
+  font-size:90px;color:rgba(255,255,255,0.05);
+  font-family:'Playfair Display',serif;line-height:1;pointer-events:none;
+}
+.quote-text{font-family:'Playfair Display',serif;font-size:15px;line-height:1.65;margin-bottom:12px;position:relative;}
+.quote-author{font-size:11px;color:var(--skylight);font-weight:600;letter-spacing:0.5px;}
+.quote-day{font-size:11px;color:var(--muted);float:right;}
+
+/* ===== STATS ===== */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--rs);padding:14px 8px;text-align:center;
+}
+.stat-num{font-size:24px;font-weight:700;font-family:'Playfair Display',serif;}
+.stat-lbl{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:0.5px;}
+.stat-ico{font-size:16px;margin-bottom:2px;}
+
+/* ===== COUNTDOWN ===== */
+.countdown-card{
+  background:linear-gradient(135deg,rgba(15,32,68,0.9),rgba(26,79,160,0.25));
+  border:1px solid rgba(59,142,232,0.2);border-radius:var(--r);
+  padding:18px;margin-bottom:14px;text-align:center;
+}
+.countdown-num{font-family:'Playfair Display',serif;font-size:52px;font-weight:900;color:var(--accent);line-height:1;}
+.countdown-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:6px;}
+
+/* ===== PROGRESS RING ===== */
+.ring-wrap{width:96px;height:96px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ring-wrap svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.ring-inner{position:relative;z-index:1;text-align:center;}
+.ring-pct{font-size:20px;font-weight:700;font-family:'Playfair Display',serif;}
+.ring-sub{font-size:9px;color:var(--muted);}
+
+/* ===== PROGRESS BARS ===== */
+.pb-wrap{background:rgba(255,255,255,0.07);border-radius:99px;height:7px;overflow:hidden;}
+.pb{height:100%;border-radius:99px;transition:width 0.6s cubic-bezier(.4,0,.2,1);}
+.pb-blue{background:linear-gradient(90deg,var(--blue2),var(--skylight));}
+.pb-gold{background:linear-gradient(90deg,var(--accent2),#fde68a);}
+.pb-green{background:linear-gradient(90deg,#059669,var(--success));}
+
+/* ===== BUTTONS ===== */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(135deg,var(--blue2),var(--sky));
+  color:white;border:none;border-radius:var(--rs);
+  padding:13px 20px;font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:600;cursor:pointer;
+  transition:all 0.2s;width:100%;letter-spacing:0.2px;
+}
+.btn:active{transform:scale(0.97);}
+.btn.ghost{background:transparent;border:1px solid var(--border2);color:var(--muted);}
+.btn.accent{background:linear-gradient(135deg,var(--accent2),#fde68a);color:var(--navy);}
+.btn.sm{padding:9px 16px;font-size:12px;width:auto;}
+.btn.danger{background:linear-gradient(135deg,#dc2626,#f87171);color:white;}
+
+/* ===== MOOD ===== */
+.mood-row{display:flex;justify-content:space-between;gap:6px;}
+.mood-btn{
+  flex:1;padding:10px 4px;border-radius:var(--rs);
+  background:var(--card);border:1.5px solid transparent;
+  cursor:pointer;text-align:center;transition:all 0.2s;font-size:20px;
+}
+.mood-btn.selected{border-color:var(--skylight);background:rgba(59,142,232,0.2);}
+.mood-lbl{font-size:8px;color:var(--muted);display:block;margin-top:3px;letter-spacing:0.3px;}
+
+/* ===== PILLS ===== */
+.pill{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;}
+.pill-blue{background:rgba(59,142,232,0.18);color:var(--skylight);border:1px solid rgba(59,142,232,0.28);}
+.pill-green{background:rgba(34,211,160,0.18);color:var(--success);border:1px solid rgba(34,211,160,0.28);}
+.pill-gold{background:rgba(251,191,36,0.15);color:var(--accent);border:1px solid rgba(251,191,36,0.28);}
+.pill-red{background:rgba(248,113,113,0.15);color:var(--danger);border:1px solid rgba(248,113,113,0.28);}
+.pill-purple{background:rgba(167,139,250,0.15);color:var(--purple);border:1px solid rgba(167,139,250,0.28);}
+
+/* ===== TOPIC LIST ===== */
+.topic-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 0;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background 0.15s;
+}
+.topic-row:last-child{border-bottom:none;}
+.topic-row:active{background:rgba(255,255,255,0.03);}
+.topic-check{
+  width:24px;height:24px;border-radius:50%;
+  border:2px solid var(--border2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;transition:all 0.25s;
+}
+.topic-check.done{background:var(--success);border-color:var(--success);color:var(--navy);}
+.topic-check.partial{background:var(--blue2);border-color:var(--blue2);}
+.topic-info{flex:1;min-width:0;}
+.topic-name{font-size:13px;font-weight:600;}
+.topic-sub{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topic-pct{font-size:13px;font-weight:700;color:var(--skylight);flex-shrink:0;}
+.topic-arrow{font-size:14px;color:var(--muted);flex-shrink:0;}
+
+/* ===== TOPIC DETAIL PAGE ===== */
+.subtopic-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 0;border-bottom:1px solid var(--border);
+}
+.subtopic-item:last-child{border-bottom:none;}
+.sub-check{
+  width:20px;height:20px;border-radius:5px;
+  border:2px solid var(--border2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;cursor:pointer;transition:all 0.2s;
+}
+.sub-check.done{background:var(--success);border-color:var(--success);color:var(--navy);}
+.sub-info{flex:1;}
+.sub-name{font-size:13px;font-weight:500;}
+.sub-detail{font-size:11px;color:var(--muted);margin-top:2px;}
+.difficulty-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+}
+
+/* ===== LOG ===== */
+.log-input{
+  width:100%;background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);border-radius:var(--rs);
+  color:var(--white);font-family:'DM Sans',sans-serif;
+  font-size:14px;padding:12px;resize:none;outline:none;
+  transition:border 0.2s;margin-bottom:10px;
+}
+.log-input::placeholder{color:var(--muted);}
+.log-input:focus{border-color:var(--sky);}
+.log-entry{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--rs);padding:14px;margin-bottom:10px;
+}
+.log-eh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.log-date{font-size:11px;color:var(--skylight);font-weight:600;}
+.log-meta{font-size:11px;color:var(--muted);}
+.log-text{font-size:13px;color:rgba(248,250,255,0.8);line-height:1.6;}
+.num-input{
+  background:rgba(255,255,255,0.06);border:1px solid var(--border);
+  border-radius:var(--rs);color:var(--white);font-family:'DM Sans',sans-serif;
+  font-size:14px;padding:10px 12px;outline:none;width:100%;transition:border 0.2s;
+}
+.num-input:focus{border-color:var(--sky);}
+.num-input::placeholder{color:var(--muted);}
+
+/* ===== BADGES ===== */
+.badge-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.badge-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--rs);padding:16px;text-align:center;transition:all 0.3s;
+}
+.badge-card.unlocked{border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.07);}
+.badge-card.locked{opacity:0.38;}
+.badge-ico{font-size:30px;margin-bottom:6px;}
+.badge-name{font-size:11px;font-weight:700;color:var(--white);}
+.badge-desc{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4;}
+
+/* ===== TIMER ===== */
+.timer-display{
+  font-family:'Playfair Display',serif;font-size:36px;font-weight:900;
+  color:var(--skylight);text-align:center;margin:12px 0;letter-spacing:2px;
+}
+.timer-row{display:flex;gap:8px;justify-content:center;}
+.tbtn{
+  padding:10px 22px;border-radius:var(--rs);font-size:13px;font-weight:700;
+  cursor:pointer;border:none;transition:all 0.2s;font-family:'DM Sans',sans-serif;
+}
+.tbtn:active{transform:scale(0.96);}
+.tbtn.play{background:var(--success);color:var(--navy);}
+.tbtn.stop{background:var(--danger);color:white;}
+.tbtn.reset{background:var(--card2);color:var(--muted);border:1px solid var(--border);}
+
+/* ===== MILESTONE ===== */
+.milestone-banner{
+  background:linear-gradient(135deg,rgba(251,191,36,0.18),rgba(245,158,11,0.08));
+  border:1px solid rgba(251,191,36,0.35);border-radius:var(--r);
+  padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:14px;
+  cursor:pointer;transition:all 0.2s;
+}
+.milestone-banner:hover{background:rgba(251,191,36,0.22);}
+
+/* ===== GAME ===== */
+.game-overlay{
+  position:fixed;inset:0;background:rgba(10,22,40,0.97);
+  z-index:500;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:20px;
+  overflow-y:auto;
+}
+.game-q-card{
+  background:var(--card2);border:1px solid var(--border2);
+  border-radius:var(--r);padding:22px;margin-bottom:18px;
+  font-size:15px;font-weight:500;line-height:1.6;text-align:center;
+  max-width:360px;width:100%;
+}
+.game-opt{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--rs);padding:14px 16px;cursor:pointer;
+  font-size:13px;font-weight:500;text-align:left;
+  transition:all 0.2s;color:var(--white);width:100%;margin-bottom:8px;
+  font-family:'DM Sans',sans-serif;
+}
+.game-opt:hover{border-color:var(--sky);background:rgba(59,142,232,0.15);}
+.game-opt.correct{border-color:var(--success);background:rgba(34,211,160,0.15);color:var(--success);}
+.game-opt.wrong{border-color:var(--danger);background:rgba(248,113,113,0.15);color:var(--danger);}
+
+/* ===== MOOD CHART ===== */
+.chart-wrap{position:relative;height:120px;}
+
+/* ===== BACK BUTTON ===== */
+.back-btn{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--skylight);font-weight:600;
+  cursor:pointer;margin-bottom:16px;
+  width:fit-content;padding:6px 0;
+}
+.back-btn:active{opacity:0.7;}
+
+/* ===== OVERVIEW GRID ===== */
+.overview-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.ov-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--rs);padding:14px;cursor:pointer;
+  transition:all 0.2s;position:relative;overflow:hidden;
+}
+.ov-card:hover{border-color:var(--border2);background:var(--card2);}
+.ov-card:active{transform:scale(0.97);}
+.ov-card::after{
+  content:'→';position:absolute;bottom:10px;right:12px;
+  font-size:14px;color:var(--muted);transition:all 0.2s;
+}
+.ov-card:hover::after{color:var(--skylight);transform:translateX(3px);}
+.ov-ico{font-size:22px;margin-bottom:6px;}
+.ov-name{font-size:12px;font-weight:700;line-height:1.3;margin-bottom:4px;}
+.ov-pct{font-size:18px;font-weight:700;font-family:'Playfair Display',serif;color:var(--skylight);}
+
+/* ===== STUDY NOTES ===== */
+.note-input{
+  width:100%;background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);border-radius:var(--rs);
+  color:var(--white);font-family:'DM Sans',sans-serif;
+  font-size:13px;padding:12px;resize:none;outline:none;
+  transition:border 0.2s;min-height:80px;
+}
+.note-input:focus{border-color:var(--sky);}
+.note-item{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--rs);padding:12px;margin-top:8px;
+  font-size:13px;line-height:1.6;color:rgba(248,250,255,0.85);
+  position:relative;
+}
+.note-date{font-size:10px;color:var(--muted);margin-bottom:6px;}
+
+/* ===== TOAST ===== */
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:rgba(15,32,68,0.97);border:1px solid var(--sky);
+  border-radius:var(--rs);padding:10px 20px;font-size:13px;
+  color:var(--skylight);font-weight:600;z-index:600;
+  opacity:0;transition:all 0.3s;white-space:nowrap;
+  backdrop-filter:blur(10px);pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ===== CONFETTI ===== */
+.confetti-piece{
+  position:fixed;pointer-events:none;z-index:700;
+  animation:cffall 2.5s ease-in forwards;border-radius:2px;
+}
+@keyframes cffall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0;}
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(16px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.fade-up{animation:fadeUp 0.35s ease both;}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:0;height:0;}
+
+.flex{display:flex;align-items:center;}
+.gap8{gap:8px;}
+.gap12{gap:12px;}
+.flex1{flex:1;}
+.mt8{margin-top:8px;}
+.mt12{margin-top:12px;}
+.mt16{margin-top:16px;}
+.mb8{margin-bottom:8px;}
+.mb12{margin-bottom:12px;}
+.sec-hdr{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;font-weight:600;margin:18px 0 10px;}
+
+input[type=range]{accent-color:var(--sky);}
+</style>
+</head>
+<body>
+
+<!-- ===== PAGE: HOME ===== -->
+<div class="page active" id="pg-home">
+<div class="wrap">
+<div class="hdr">
+  <div class="hdr-eyebrow" id="hdr-date"></div>
+  <div class="hdr-title">CFA L2 <span>Command Center</span></div>
+  <div class="hdr-sub" id="hdr-greet"></div>
+</div>
+
+<div class="countdown-card">
+  <div class="countdown-num" id="countdown-num">—</div>
+  <div class="countdown-lbl">Days to CFA Level II Exam · Nov 2025</div>
+</div>
+
+<div class="quote-card">
+  <div class="quote-text" id="q-text"></div>
+  <div>
+    <span class="quote-author" id="q-author"></span>
+    <span class="quote-day" id="q-day"></span>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-ico">🔥</div>
+    <div class="stat-num" id="s-streak">0</div>
+    <div class="stat-lbl">Streak</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-ico">⏱️</div>
+    <div class="stat-num" id="s-hours">0</div>
+    <div class="stat-lbl">Hrs Logged</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-ico">🏆</div>
+    <div class="stat-num" id="s-badges">0</div>
+    <div class="stat-lbl">Badges</div>
+  </div>
+</div>
+
+<div class="milestone-banner" id="milestone-banner" style="display:none" onclick="launchGame()">
+  <div style="font-size:28px">🎯</div>
+  <div style="flex:1">
+    <div style="font-size:13px;font-weight:700;color:var(--accent)">Milestone Unlocked!</div>
+    <div style="font-size:11px;color:rgba(251,191,36,0.7)" id="milestone-txt">Tap to play reward quiz</div>
+  </div>
+  <div style="font-size:18px;color:var(--accent)">→</div>
+</div>
+
+<div class="card">
+  <div class="card-title">Overall Readiness</div>
+  <div class="flex gap12">
+    <div class="ring-wrap">
+      <svg width="96" height="96" viewBox="0 0 96 96">
+        <circle cx="48" cy="48" r="40" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="9"/>
+        <circle cx="48" cy="48" r="40" fill="none" stroke="url(#rg)" stroke-width="9"
+          stroke-dasharray="251.3" stroke-dashoffset="251.3" id="ring-c" stroke-linecap="round"/>
+        <defs>
+          <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#2563c7"/>
+            <stop offset="100%" stop-color="#7ab8f5"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="ring-inner">
+        <div class="ring-pct" id="ring-pct">0%</div>
+        <div class="ring-sub">done</div>
+      </div>
+    </div>
+    <div class="flex1">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px">Topics ≥80% Mastered</div>
+      <div style="font-size:24px;font-weight:700;font-family:'Playfair Display',serif" id="mastered-cnt">0 / 10</div>
+      <div style="margin-top:10px"><div class="pb-wrap"><div class="pb pb-blue" id="overall-bar" style="width:0%"></div></div></div>
+      <button class="btn sm" style="margin-top:12px;width:100%" onclick="goPage('pg-topics')">View All Topics →</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Study Timer</div>
+  <div class="timer-display" id="timer-disp">00:00:00</div>
+  <div class="timer-row">
+    <button class="tbtn play" id="tbtn-play" onclick="timerToggle()">▶ Start</button>
+    <button class="tbtn reset" onclick="timerReset()">↺ Reset</button>
+  </div>
+  <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px">
+    Session: <span id="session-hrs" style="color:var(--skylight);font-weight:600">0h 0m</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Today's Mood</div>
+  <div class="mood-row" id="home-mood">
+    <div class="mood-btn" onclick="setMood(this,'😫','Drained')">😫<span class="mood-lbl">Drained</span></div>
+    <div class="mood-btn" onclick="setMood(this,'😐','Okay')">😐<span class="mood-lbl">Okay</span></div>
+    <div class="mood-btn" onclick="setMood(this,'💪','Focused')">💪<span class="mood-lbl">Focused</span></div>
+    <div class="mood-btn" onclick="setMood(this,'🔥','On Fire')">🔥<span class="mood-lbl">On Fire</span></div>
+    <div class="mood-btn" onclick="setMood(this,'🧠','Sharp')">🧠<span class="mood-lbl">Sharp</span></div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /pg-home -->
+
+<!-- ===== PAGE: TOPICS OVERVIEW ===== -->
+<div class="page" id="pg-topics">
+<div class="wrap">
+<div class="hdr">
+  <div class="hdr-eyebrow">CFA Level II Curriculum</div>
+  <div class="hdr-title">Topic <span>Tracker</span></div>
+  <div class="hdr-sub">Tap any topic for deep-dive tracking</div>
+</div>
+
+<div class="card" style="margin-bottom:14px">
+  <div class="card-title">Curriculum Progress</div>
+  <div class="pb-wrap mb8"><div class="pb pb-blue" id="topics-overall-bar" style="width:0%"></div></div>
+  <div style="font-size:12px;color:var(--muted)" id="topics-overall-txt">0% complete across all topics</div>
+</div>
+
+<div class="overview-grid" id="topics-grid"></div>
+
+</div>
+</div>
+
+<!-- ===== PAGE: TOPIC DETAIL ===== -->
+<div class="page" id="pg-topic-detail">
+<div class="wrap">
+<div class="hdr" style="padding-top:36px">
+  <div class="back-btn" onclick="goPage('pg-topics')">← Back to Topics</div>
+  <div class="hdr-eyebrow" id="td-eyebrow">Topic</div>
+  <div class="hdr-title" id="td-title">Topic Name</div>
+  <div class="hdr-sub" id="td-sub"></div>
+</div>
+
+<div class="card">
+  <div class="card-title">Progress</div>
+  <div class="flex gap12" style="margin-bottom:12px">
+    <div style="flex:1">
+      <div class="pb-wrap"><div class="pb pb-blue" id="td-bar" style="width:0%"></div></div>
+    </div>
+    <div style="font-size:20px;font-weight:700;font-family:'Playfair Display',serif;color:var(--skylight);min-width:44px;text-align:right" id="td-pct">0%</div>
+  </div>
+  <div class="flex gap8">
+    <span class="pill pill-blue" id="td-weight-pill"></span>
+    <span class="pill" id="td-status-pill"></span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Quick Adjust</div>
+  <div class="flex gap12">
+    <input type="range" min="0" max="100" step="5" value="0" id="td-slider" oninput="tdSliderChange(this.value)" style="flex:1">
+    <span style="font-size:13px;font-weight:700;color:var(--skylight);min-width:36px;text-align:right" id="td-slider-lbl">0%</span>
+  </div>
+</div>
+
+<div class="sec-hdr">Subtopics</div>
+<div class="card" id="td-subtopics"></div>
+
+<div class="sec-hdr">Study Notes</div>
+<div class="card">
+  <textarea class="note-input" id="td-note-input" placeholder="Add a note, formula, or key concept for this topic..." rows="3"></textarea>
+  <button class="btn sm" onclick="saveNote()">+ Save Note</button>
+  <div id="td-notes-list"></div>
+</div>
+
+<div class="sec-hdr">Quick Stats</div>
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-ico">✅</div>
+    <div class="stat-num" id="td-done-cnt">0</div>
+    <div class="stat-lbl">Done</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-ico">📝</div>
+    <div class="stat-num" id="td-sub-cnt">0</div>
+    <div class="stat-lbl">Total</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-ico">⚡</div>
+    <div class="stat-num" id="td-completion">0%</div>
+    <div class="stat-lbl">Subtopic %</div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<!-- ===== PAGE: LOG ===== -->
+<div class="page" id="pg-log">
+<div class="wrap">
+<div class="hdr">
+  <div class="hdr-eyebrow">Daily Prep Log</div>
+  <div class="hdr-title">Study <span>Journal</span></div>
+</div>
+
+<div class="card">
+  <div class="card-title">Log Today's Session</div>
+  <div class="mood-row mb12" id="log-mood-row">
+    <div class="mood-btn" onclick="setLogMood(this,'😫')">😫<span class="mood-lbl">Drained</span></div>
+    <div class="mood-btn" onclick="setLogMood(this,'😐')">😐<span class="mood-lbl">Okay</span></div>
+    <div class="mood-btn" onclick="setLogMood(this,'💪')">💪<span class="mood-lbl">Focused</span></div>
+    <div class="mood-btn" onclick="setLogMood(this,'🔥')">🔥<span class="mood-lbl">On Fire</span></div>
+    <div class="mood-btn" onclick="setLogMood(this,'🧠')">🧠<span class="mood-lbl">Sharp</span></div>
+  </div>
+  <textarea class="log-input" id="log-txt" rows="4" placeholder="What did you study? Breakthroughs? Struggles?"></textarea>
+  <div class="flex gap8 mb12">
+    <div style="flex:1">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Hours studied</div>
+      <input class="num-input" type="number" id="log-hrs" min="0" max="16" step="0.5" placeholder="e.g. 3.5">
+    </div>
+    <div style="flex:1">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Practice Qs</div>
+      <input class="num-input" type="number" id="log-qs" min="0" step="1" placeholder="e.g. 40">
+    </div>
+  </div>
+  <button class="btn" onclick="submitLog()">✦ Log Session</button>
+</div>
+
+<div class="sec-hdr">Previous Entries</div>
+<div id="log-entries-wrap"></div>
+
+</div>
+</div>
+
+<!-- ===== PAGE: ACHIEVEMENTS ===== -->
+<div class="page" id="pg-wins">
+<div class="wrap">
+<div class="hdr">
+  <div class="hdr-eyebrow">Your CFA Journey</div>
+  <div class="hdr-title">Hall of <span>Achievements</span></div>
+</div>
+
+<div class="card">
+  <div class="card-title">Mood & Hours — Last 7 Days</div>
+  <canvas id="mood-chart" width="380" height="120"></canvas>
+</div>
+
+<div class="card">
+  <div class="card-title">Total Study Stats</div>
+  <div class="stats-row" style="margin:0">
+    <div class="stat-card">
+      <div class="stat-ico">⏱️</div>
+      <div class="stat-num" id="win-hrs">0</div>
+      <div class="stat-lbl">Hours</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico">📝</div>
+      <div class="stat-num" id="win-qs">0</div>
+      <div class="stat-lbl">Qs Done</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico">📅</div>
+      <div class="stat-num" id="win-days">0</div>
+      <div class="stat-lbl">Days</div>
+    </div>
+  </div>
+</div>
+
+<div class="sec-hdr">Badges</div>
+<div class="badge-grid" id="badge-grid"></div>
+
+</div>
+</div>
+
+<!-- ===== GLOBAL NAV ===== -->
+<nav class="nav-bar">
+  <div class="nav-item active" id="nav-home" onclick="goPage('pg-home',this)">
+    <div class="nav-ico">⚡</div>
+    <div class="nav-lbl">Home</div>
+  </div>
+  <div class="nav-item" id="nav-topics" onclick="goPage('pg-topics',this)">
+    <div class="nav-ico">📊</div>
+    <div class="nav-lbl">Topics</div>
+  </div>
+  <div class="nav-item" id="nav-log" onclick="goPage('pg-log',this)">
+    <div class="nav-ico">📓</div>
+    <div class="nav-lbl">Log</div>
+  </div>
+  <div class="nav-item" id="nav-wins" onclick="goPage('pg-wins',this)">
+    <div class="nav-ico">🏆</div>
+    <div class="nav-lbl">Wins</div>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- GAME CONTAINER -->
+<div id="game-wrap" style="display:none"></div>
+
+<script>
+// ============================================================
+// DATA DEFINITIONS
+// ============================================================
+const QUOTES=[
+  {t:"Investment in knowledge pays the best interest.",a:"Benjamin Franklin"},
+  {t:"Risk comes from not knowing what you're doing.",a:"Warren Buffett"},
+  {t:"The market can stay irrational longer than you can stay solvent.",a:"J.M. Keynes"},
+  {t:"Compound interest is the eighth wonder of the world.",a:"Albert Einstein"},
+  {t:"Price is what you pay. Value is what you get.",a:"Warren Buffett"},
+  {t:"In investing, what is comfortable is rarely profitable.",a:"Robert Arnott"},
+  {t:"Know what you own, and know why you own it.",a:"Peter Lynch"},
+  {t:"The expert in anything was once a beginner.",a:"Helen Hayes"},
+  {t:"It always seems impossible until it's done.",a:"Nelson Mandela"},
+  {t:"Success is the sum of small efforts, repeated day in and day out.",a:"Robert Collier"},
+  {t:"Discipline is the bridge between goals and accomplishment.",a:"Jim Rohn"},
+  {t:"Don't watch the clock; do what it does. Keep going.",a:"Sam Levenson"},
+  {t:"Every master was once a disaster.",a:"T. Harv Eker"},
+  {t:"The only way to do great work is to love what you do.",a:"Steve Jobs"},
+  {t:"Believe you can and you're halfway there.",a:"Theodore Roosevelt"},
+  {t:"Great things never come from comfort zones.",a:"Unknown"},
+  {t:"Far more money has been lost by investors preparing for corrections than has been lost in corrections themselves.",a:"Peter Lynch"},
+  {t:"Wide diversification is only required when investors do not understand what they are doing.",a:"Warren Buffett"},
+  {t:"Motivation is what gets you started. Habit is what keeps you going.",a:"Jim Ryun"},
+  {t:"Your future is created by what you do today, not tomorrow.",a:"Robert T. Kiyosaki"},
+  {t:"The key to success is to focus on goals, not obstacles.",a:"Unknown"},
+  {t:"Opportunities don't happen. You create them.",a:"Chris Grosser"},
+  {t:"The secret of getting ahead is getting started.",a:"Mark Twain"},
+  {t:"Do not go where the path may lead; go where there is no path.",a:"Ralph Waldo Emerson"},
+  {t:"Push yourself, because no one else is going to do it for you.",a:"Unknown"},
+  {t:"Dream it. Wish it. Do it.",a:"Unknown"},
+  {t:"Success doesn't just find you. You have to go out and get it.",a:"Unknown"},
+  {t:"Excellence is not a destination but a continuous journey.",a:"Brian Tracy"},
+  {t:"An investment in knowledge always pays the best dividends.",a:"Benjamin Franklin"},
+  {t:"The stock market is a device to transfer money from the impatient to the patient.",a:"Warren Buffett"}
+];
+
+const TOPICS=[
+  {id:'t1',name:'Quantitative Methods',emoji:'📐',weight:5,
+   subs:[
+     {name:'Multiple Regression',detail:'OLS assumptions, F-test, t-test',done:false,diff:'med'},
+     {name:'Time-Series Analysis',detail:'AR, MA, ARMA models, unit root',done:false,diff:'hard'},
+     {name:'Machine Learning',detail:'Supervised, unsupervised, neural nets',done:false,diff:'hard'},
+     {name:'Big Data & Fintech',detail:'Alternative data, NLP in finance',done:false,diff:'med'},
+     {name:'Simulation Methods',detail:'Monte Carlo, bootstrapping',done:false,diff:'med'},
+   ],progress:0,notes:[]},
+  {id:'t2',name:'Economics',emoji:'🌐',weight:5,
+   subs:[
+     {name:'Currency Exchange Rates',detail:'PPP, IRP, BOP, forecasting models',done:false,diff:'hard'},
+     {name:'Economic Growth',detail:'Neoclassical vs endogenous growth',done:false,diff:'med'},
+     {name:'Regulation',detail:'Regulatory frameworks, market structure',done:false,diff:'easy'},
+   ],progress:0,notes:[]},
+  {id:'t3',name:'Financial Reporting',emoji:'📋',weight:10,
+   subs:[
+     {name:'Intercorporate Investments',detail:'Equity method, consolidation, IFRS 9',done:false,diff:'hard'},
+     {name:'Employee Compensation',detail:'Pensions, stock-based comp, IFRS vs GAAP',done:false,diff:'hard'},
+     {name:'Multinational Operations',detail:'Translation methods, hyperinflation',done:false,diff:'med'},
+     {name:'Quality of Financial Reporting',detail:'Manipulation, red flags',done:false,diff:'med'},
+     {name:'Financial Statement Analysis',detail:'Integration of techniques',done:false,diff:'med'},
+   ],progress:0,notes:[]},
+  {id:'t4',name:'Corporate Issuers',emoji:'🏢',weight:10,
+   subs:[
+     {name:'Capital Structure',detail:'MM theorems, trade-off, pecking order',done:false,diff:'hard'},
+     {name:'Dividends & Share Repurchases',detail:'Dividend policy, signaling',done:false,diff:'med'},
+     {name:'Corporate Governance',detail:'Stakeholder relationships, ESG',done:false,diff:'easy'},
+     {name:'M&A Overview',detail:'Valuation, synergies, deal structure',done:false,diff:'hard'},
+     {name:'Business Models',detail:'Revenue streams, competitive dynamics',done:false,diff:'easy'},
+   ],progress:0,notes:[]},
+  {id:'t5',name:'Equity Valuation',emoji:'📈',weight:10,
+   subs:[
+     {name:'Overview & Context',detail:'Absolute vs relative value',done:false,diff:'easy'},
+     {name:'Dividend Discount Models',detail:'Gordon Growth, H-model, multi-stage',done:false,diff:'hard'},
+     {name:'Free Cash Flow Models',detail:'FCFF vs FCFE, WACC',done:false,diff:'hard'},
+     {name:'Market-Based Valuation',detail:'P/E, P/B, EV/EBITDA, price multiples',done:false,diff:'med'},
+     {name:'Residual Income',detail:'RI model, EVA, clean surplus',done:false,diff:'hard'},
+     {name:'Private Company Valuation',detail:'Control premium, DLOM',done:false,diff:'med'},
+   ],progress:0,notes:[]},
+  {id:'t6',name:'Fixed Income',emoji:'🏦',weight:10,
+   subs:[
+     {name:'Term Structure of Interest Rates',detail:'Spot, forward, par rates; theories',done:false,diff:'hard'},
+     {name:'Arbitrage-Free Valuation',detail:'Binomial interest rate tree',done:false,diff:'hard'},
+     {name:'Valuing Bonds with Embedded Options',detail:'OAS, effective duration',done:false,diff:'hard'},
+     {name:'Credit Analysis Models',detail:'Structural, reduced-form, credit scores',done:false,diff:'hard'},
+     {name:'Credit Default Swaps',detail:'CDS mechanics, pricing, applications',done:false,diff:'hard'},
+     {name:'Securitization',detail:'MBS, ABS, CMO structures',done:false,diff:'med'},
+   ],progress:0,notes:[]},
+  {id:'t7',name:'Derivatives',emoji:'⚙️',weight:10,
+   subs:[
+     {name:'Pricing & Valuation of Forwards',detail:'Cost of carry model',done:false,diff:'hard'},
+     {name:'Pricing & Valuation of Futures',detail:'MTM, backwardation, contango',done:false,diff:'hard'},
+     {name:'Pricing & Valuation of Swaps',detail:'Interest rate, currency, equity swaps',done:false,diff:'hard'},
+     {name:'Pricing & Valuation of Options',detail:'BSM, put-call parity, Greeks',done:false,diff:'hard'},
+     {name:'Option Strategies',detail:'Spreads, collars, straddles',done:false,diff:'med'},
+     {name:'Exotic Options & Structured',detail:'Barrier, Asian, structured notes',done:false,diff:'hard'},
+   ],progress:0,notes:[]},
+  {id:'t8',name:'Alternative Investments',emoji:'💎',weight:10,
+   subs:[
+     {name:'Private Capital',detail:'PE, VC, LBO structures & returns',done:false,diff:'hard'},
+     {name:'Real Assets',detail:'Real estate, infrastructure, commodities',done:false,diff:'med'},
+     {name:'Hedge Funds',detail:'Strategies, CAPM alpha, fee structures',done:false,diff:'hard'},
+     {name:'Risk Management',detail:'VaR, CVaR, alternative risk premia',done:false,diff:'hard'},
+   ],progress:0,notes:[]},
+  {id:'t9',name:'Portfolio Management',emoji:'🎯',weight:15,
+   subs:[
+     {name:'Portfolio Risk & Return: Part I',detail:'Mean-variance, efficient frontier',done:false,diff:'hard'},
+     {name:'Portfolio Risk & Return: Part II',detail:'CAPM, SML, CML',done:false,diff:'hard'},
+     {name:'Multifactor Models',detail:'APT, Fama-French, style factors',done:false,diff:'hard'},
+     {name:'Measuring & Managing Risk',detail:'VaR, scenario analysis, liquidity risk',done:false,diff:'hard'},
+     {name:'Backtesting & Simulation',detail:'Overfitting, look-ahead bias',done:false,diff:'med'},
+     {name:'Economics & Investment Markets',detail:'Macroeconomic factor models',done:false,diff:'med'},
+     {name:'Asset Allocation',detail:'SAA, TAA, risk budgeting',done:false,diff:'med'},
+   ],progress:0,notes:[]},
+  {id:'t10',name:'Ethical & Professional Standards',emoji:'⚖️',weight:10,
+   subs:[
+     {name:'Standards I: Professionalism',detail:'Knowledge of law, independence',done:false,diff:'easy'},
+     {name:'Standards II: Integrity of Capital',detail:'Material nonpublic info, market manipulation',done:false,diff:'med'},
+     {name:'Standards III: Duties to Clients',detail:'Loyalty, prudence, fair dealing',done:false,diff:'easy'},
+     {name:'Standards IV: Duties to Employers',detail:'Loyalty, whistleblowing',done:false,diff:'easy'},
+     {name:'Standards V: Investment Analysis',detail:'Diligence, communication',done:false,diff:'med'},
+     {name:'Standards VI: Conflicts of Interest',detail:'Disclosure, priority of transactions',done:false,diff:'med'},
+     {name:'Standards VII: Responsibilities',detail:'Conduct, CFA program integrity',done:false,diff:'easy'},
+     {name:'GIPS',detail:'Composite construction, verification',done:false,diff:'hard'},
+   ],progress:0,notes:[]},
+];
+
+const BADGES=[
+  {id:'b1',ico:'👣',name:'First Step',desc:'Log your first session',fn:s=>s.logCount>=1},
+  {id:'b2',ico:'🔥',name:'Week Warrior',desc:'7-day study streak',fn:s=>s.streak>=7},
+  {id:'b3',ico:'⏱️',name:'50 Hours',desc:'Log 50+ study hours',fn:s=>s.totalHours>=50},
+  {id:'b4',ico:'📚',name:'100 Hours',desc:'Log 100+ study hours',fn:s=>s.totalHours>=100},
+  {id:'b5',ico:'🎯',name:'Half Way',desc:'50% overall progress',fn:s=>s.overall>=50},
+  {id:'b6',ico:'🏆',name:'Topic Master',desc:'Complete any topic 100%',fn:s=>s.maxTopic>=100},
+  {id:'b7',ico:'🧠',name:'Question Beast',desc:'500 practice questions',fn:s=>s.totalQs>=500},
+  {id:'b8',ico:'⭐',name:'Almost There',desc:'80% overall progress',fn:s=>s.overall>=80},
+  {id:'b9',ico:'🎓',name:'CFA Ready',desc:'100% overall progress',fn:s=>s.overall>=100},
+  {id:'b10',ico:'📓',name:'Journaler',desc:'10 log entries',fn:s=>s.logCount>=10},
+];
+
+const QUIZ=[
+  {q:"Which model values equity using dividend discount?",o:["Gordon Growth Model","FCFF Model","Residual Income","EV/EBITDA"],a:0},
+  {q:"The OAS spread on a callable bond is calculated relative to:",o:["Par curve","Spot curve","Benchmark OAS tree","Treasury yield"],a:2},
+  {q:"Under IFRS, goodwill impairment is tested:",o:["Annually","Only when triggered","Every 5 years","Never"],a:0},
+  {q:"A protective put combines long stock with:",o:["Short call","Long call","Long put","Short put"],a:2},
+  {q:"Credit default swaps primarily transfer:",o:["Market risk","Liquidity risk","Credit risk","Currency risk"],a:2},
+  {q:"Equity risk premium is best defined as:",o:["Risk-free minus inflation","Expected equity return minus risk-free","Beta × market return","Dividend yield + growth"],a:1},
+  {q:"FCFE adjusts FCFF by subtracting:",o:["Dividends","Capital expenditures","Net borrowing","Tax shield"],a:2},
+  {q:"Convexity adjustment matters most for bonds with:",o:["Short duration","High coupon","Large yield changes","Fixed spread"],a:2},
+  {q:"LBO private equity deals primarily rely on:",o:["Equity only","High leverage","Government bonds","Derivatives"],a:1},
+  {q:"CFA Standard III primarily covers:",o:["Market manipulation","Duties to clients","Duties to employers","Conflicts of interest"],a:1},
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let ST={
+  topics:TOPICS.map(t=>({...t,subs:t.subs.map(s=>({...s})),notes:[]})),
+  logs:[],streak:0,lastLogDate:null,
+  totalHours:0,totalQs:0,logCount:0,
+  unlockedBadges:[],timerSecs:0,timerRunning:false,
+  todayMood:null,logMood:null,prevOverall:0,
+};
+let _timerInt=null;
+let _currentTopicIdx=0;
+
+function load(){
+  try{
+    const d=localStorage.getItem('cfa_l2_v3');
+    if(d){
+      const p=JSON.parse(d);
+      ST={...ST,...p,timerRunning:false};
+    }
+  }catch(e){}
+}
+function save(){
+  try{localStorage.setItem('cfa_l2_v3',JSON.stringify({...ST,timerRunning:false}));}catch(e){}
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+const NAV_MAP={
+  'pg-home':'nav-home','pg-topics':'nav-topics',
+  'pg-log':'nav-log','pg-wins':'nav-wins'
+};
+
+function goPage(id,navEl){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const navId=NAV_MAP[id];
+  if(navId)document.getElementById(navId).classList.add('active');
+  if(navEl)navEl.classList.add('active');
+
+  if(id==='pg-home')refreshHome();
+  if(id==='pg-topics')renderTopicsGrid();
+  if(id==='pg-log')renderLogs();
+  if(id==='pg-wins')renderWins();
+}
+
+// ============================================================
+// HOME
+// ============================================================
+function refreshHome(){
+  const now=new Date();
+  const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MONS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('hdr-date').textContent=
+    DAYS[now.getDay()]+', '+MONS[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
+  const h=now.getHours();
+  document.getElementById('hdr-greet').textContent=
+    (h<12?'Good morning':h<17?'Good afternoon':'Good evening')+' · Let\'s crush it today 💙';
+
+  // Countdown
+  const exam=new Date('2025-11-15');
+  const diff=Math.max(0,Math.ceil((exam-now)/(86400000)));
+  document.getElementById('countdown-num').textContent=diff>0?diff:'🎓 Exam Day!';
+
+  // Quote
+  const qi=getDOY(now)%QUOTES.length;
+  document.getElementById('q-text').textContent=QUOTES[qi].t;
+  document.getElementById('q-author').textContent='— '+QUOTES[qi].a;
+  document.getElementById('q-day').textContent='Day '+getDOY(now);
+
+  // Stats
+  document.getElementById('s-streak').textContent=ST.streak;
+  document.getElementById('s-hours').textContent=Math.floor(ST.totalHours);
+  document.getElementById('s-badges').textContent=ST.unlockedBadges.length;
+
+  // Ring
+  const ov=getOverall();
+  const circ=251.3;
+  document.getElementById('ring-c').style.strokeDashoffset=circ-(ov/100)*circ;
+  document.getElementById('ring-pct').textContent=Math.round(ov)+'%';
+  document.getElementById('overall-bar').style.width=ov+'%';
+  const mastered=ST.topics.filter(t=>t.progress>=80).length;
+  document.getElementById('mastered-cnt').textContent=mastered+' / '+ST.topics.length;
+
+  // Milestone
+  const milestones=[25,50,75,100];
+  const crossed=milestones.find(m=>ov>=m&&ST.prevOverall<m);
+  if(crossed){
+    ST.prevOverall=ov;
+    document.getElementById('milestone-banner').style.display='flex';
+    document.getElementById('milestone-txt').textContent=crossed+'% reached! Tap to claim reward quiz 🎮';
+    save();
+  }
+
+  // Restore mood
+  if(ST.todayMood){
+    document.querySelectorAll('#home-mood .mood-btn').forEach(b=>{
+      if(b.textContent.startsWith(ST.todayMood)){b.classList.add('selected');}
+    });
+  }
+}
+
+function getDOY(d){
+  return Math.floor((d-new Date(d.getFullYear(),0,0))/86400000);
+}
+function getOverall(){
+  return ST.topics.reduce((s,t)=>s+t.progress,0)/ST.topics.length;
+}
+
+// ============================================================
+// TOPICS GRID
+// ============================================================
+function renderTopicsGrid(){
+  const ov=getOverall();
+  document.getElementById('topics-overall-bar').style.width=ov+'%';
+  document.getElementById('topics-overall-txt').textContent=Math.round(ov)+'% complete across all topics';
+
+  const grid=document.getElementById('topics-grid');
+  grid.innerHTML=ST.topics.map((t,i)=>{
+    const pct=t.progress;
+    const subDone=t.subs.filter(s=>s.done).length;
+    const cls=pct>=80?'pill-green':pct>=40?'pill-blue':'pill-gold';
+    return `<div class="ov-card fade-up" style="animation-delay:${i*0.04}s" onclick="openTopic(${i})">
+      <div class="ov-ico">${t.emoji}</div>
+      <div class="ov-name">${t.name}</div>
+      <div style="margin:6px 0 8px"><div class="pb-wrap" style="height:5px"><div class="pb ${pct>=100?'pb-green':pct>=50?'pb-blue':'pb-gold'}" style="width:${pct}%"></div></div></div>
+      <div class="flex gap8" style="align-items:center">
+        <div class="ov-pct">${pct}%</div>
+        <span class="pill ${cls}" style="font-size:9px">${t.weight}% exam wt</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px">${subDone}/${t.subs.length} subtopics</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// TOPIC DETAIL
+// ============================================================
+function openTopic(idx){
+  _currentTopicIdx=idx;
+  const t=ST.topics[idx];
+  document.getElementById('td-eyebrow').textContent=t.emoji+' Topic '+t.weight+'% exam weight';
+  document.getElementById('td-title').textContent=t.name;
+  document.getElementById('td-sub').textContent=t.subs.length+' subtopics to master';
+  document.getElementById('td-bar').style.width=t.progress+'%';
+  document.getElementById('td-pct').textContent=t.progress+'%';
+  document.getElementById('td-slider').value=t.progress;
+  document.getElementById('td-slider-lbl').textContent=t.progress+'%';
+  document.getElementById('td-weight-pill').textContent=t.weight+'% exam weight';
+
+  const s=t.progress;
+  let statusCls='pill-gold',statusTxt='Not Started';
+  if(s>=100){statusCls='pill-green';statusTxt='✓ Mastered';}
+  else if(s>=80){statusCls='pill-green';statusTxt='Near Mastery';}
+  else if(s>=50){statusCls='pill-blue';statusTxt='In Progress';}
+  else if(s>0){statusCls='pill-purple';statusTxt='Just Started';}
+  document.getElementById('td-status-pill').className='pill '+statusCls;
+  document.getElementById('td-status-pill').textContent=statusTxt;
+
+  renderSubtopics(t);
+  renderTopicNotes(t);
+
+  const done=t.subs.filter(s=>s.done).length;
+  document.getElementById('td-done-cnt').textContent=done;
+  document.getElementById('td-sub-cnt').textContent=t.subs.length;
+  document.getElementById('td-completion').textContent=Math.round((done/t.subs.length)*100)+'%';
+
+  document.getElementById('td-note-input').value='';
+  goPage('pg-topic-detail');
+}
+
+function renderSubtopics(t){
+  const DIFF_COLORS={easy:'var(--success)',med:'var(--accent)',hard:'var(--danger)'};
+  const DIFF_LABELS={easy:'Easy',med:'Medium',hard:'Hard'};
+  const wrap=document.getElementById('td-subtopics');
+  wrap.innerHTML=t.subs.map((s,i)=>`
+    <div class="subtopic-item">
+      <div class="sub-check ${s.done?'done':''}" onclick="toggleSub(${_currentTopicIdx},${i})" id="sc-${_currentTopicIdx}-${i}">
+        ${s.done?'✓':''}
+      </div>
+      <div class="sub-info">
+        <div class="sub-name" style="text-decoration:${s.done?'line-through':'none'};opacity:${s.done?0.5:1}">${s.name}</div>
+        <div class="sub-detail">${s.detail}</div>
+      </div>
+      <div class="difficulty-dot" style="background:${DIFF_COLORS[s.diff]}" title="${DIFF_LABELS[s.diff]}"></div>
+      <span class="pill ${s.diff==='easy'?'pill-green':s.diff==='med'?'pill-gold':'pill-red'}" style="font-size:9px">${DIFF_LABELS[s.diff]}</span>
+    </div>`).join('');
+}
+
+function renderTopicNotes(t){
+  const wrap=document.getElementById('td-notes-list');
+  if(!t.notes||!t.notes.length){wrap.innerHTML='';return;}
+  wrap.innerHTML=t.notes.slice().reverse().map(n=>`
+    <div class="note-item">
+      <div class="note-date">${new Date(n.date).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+      ${n.text}
+    </div>`).join('');
+}
+
+function toggleSub(topicIdx,subIdx){
+  const t=ST.topics[topicIdx];
+  t.subs[subIdx].done=!t.subs[subIdx].done;
+  // auto-update progress
+  const doneCnt=t.subs.filter(s=>s.done).length;
+  t.progress=Math.round((doneCnt/t.subs.length)*100);
+
+  const sc=document.getElementById('sc-'+topicIdx+'-'+subIdx);
+  sc.className='sub-check '+(t.subs[subIdx].done?'done':'');
+  sc.textContent=t.subs[subIdx].done?'✓':'';
+
+  document.getElementById('td-bar').style.width=t.progress+'%';
+  document.getElementById('td-pct').textContent=t.progress+'%';
+  document.getElementById('td-slider').value=t.progress;
+  document.getElementById('td-slider-lbl').textContent=t.progress+'%';
+
+  const done=t.subs.filter(s=>s.done).length;
+  document.getElementById('td-done-cnt').textContent=done;
+  document.getElementById('td-completion').textContent=Math.round((done/t.subs.length)*100)+'%';
+
+  save();
+  checkBadges();
+  showToast(t.subs[subIdx].done?'Subtopic checked ✓':'Subtopic unchecked');
+}
+
+function tdSliderChange(val){
+  ST.topics[_currentTopicIdx].progress=parseInt(val);
+  document.getElementById('td-slider-lbl').textContent=val+'%';
+  document.getElementById('td-bar').style.width=val+'%';
+  document.getElementById('td-pct').textContent=val+'%';
+  save();
+  checkBadges();
+}
+
+function saveNote(){
+  const txt=document.getElementById('td-note-input').value.trim();
+  if(!txt){showToast('Write something first ✏️');return;}
+  if(!ST.topics[_currentTopicIdx].notes)ST.topics[_currentTopicIdx].notes=[];
+  ST.topics[_currentTopicIdx].notes.push({text:txt,date:new Date().toISOString()});
+  document.getElementById('td-note-input').value='';
+  renderTopicNotes(ST.topics[_currentTopicIdx]);
+  save();
+  showToast('Note saved! 📝');
+}
+
+// ============================================================
+// MOOD
+// ============================================================
+function setMood(el,emoji,label){
+  document.querySelectorAll('#home-mood .mood-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  ST.todayMood=emoji;
+  save();
+  showToast('Mood: '+emoji+' '+label);
+}
+function setLogMood(el,emoji){
+  document.querySelectorAll('#log-mood-row .mood-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  ST.logMood=emoji;
+}
+
+// ============================================================
+// LOG
+// ============================================================
+function submitLog(){
+  const txt=document.getElementById('log-txt').value.trim();
+  const hrs=parseFloat(document.getElementById('log-hrs').value)||0;
+  const qs=parseInt(document.getElementById('log-qs').value)||0;
+  if(!txt&&hrs===0){showToast('Add some details first ✏️');return;}
+
+  const entry={date:new Date().toISOString(),text:txt,hours:hrs,qs,mood:ST.logMood||'😐'};
+  ST.logs.unshift(entry);
+  ST.totalHours+=hrs;
+  ST.totalQs+=qs;
+  ST.logCount++;
+
+  const today=new Date().toDateString();
+  if(ST.lastLogDate!==today){
+    const yest=new Date();yest.setDate(yest.getDate()-1);
+    ST.streak=ST.lastLogDate===yest.toDateString()?ST.streak+1:1;
+    ST.lastLogDate=today;
+  }
+
+  document.getElementById('log-txt').value='';
+  document.getElementById('log-hrs').value='';
+  document.getElementById('log-qs').value='';
+  document.querySelectorAll('#log-mood-row .mood-btn').forEach(b=>b.classList.remove('selected'));
+  ST.logMood=null;
+
+  save();
+  refreshHome();
+  renderLogs();
+  checkBadges();
+  showToast('Session logged! 🎉');
+  confetti();
+}
+
+function renderLogs(){
+  const wrap=document.getElementById('log-entries-wrap');
+  if(!ST.logs.length){
+    wrap.innerHTML='<div style="text-align:center;color:var(--muted);padding:24px;font-size:13px">No entries yet. Log your first session! 🚀</div>';
+    return;
+  }
+  const MONS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  wrap.innerHTML=ST.logs.slice(0,15).map(e=>{
+    const d=new Date(e.date);
+    return `<div class="log-entry fade-up">
+      <div class="log-eh">
+        <div>
+          <span class="log-date">${MONS[d.getMonth()]} ${d.getDate()}</span>
+          <span class="log-meta"> · ${e.hours}h · ${e.qs} Qs</span>
+        </div>
+        <span style="font-size:18px">${e.mood}</span>
+      </div>
+      ${e.text?`<div class="log-text">${e.text}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// WINS / ACHIEVEMENTS
+// ============================================================
+function checkBadges(){
+  const s={
+    logCount:ST.logCount,streak:ST.streak,totalHours:ST.totalHours,
+    overall:getOverall(),maxTopic:Math.max(...ST.topics.map(t=>t.progress)),
+    totalQs:ST.totalQs
+  };
+  BADGES.forEach(b=>{
+    if(!ST.unlockedBadges.includes(b.id)&&b.fn(s)){
+      ST.unlockedBadges.push(b.id);
+      setTimeout(()=>showToast('🏆 Badge: '+b.name+' unlocked!'),600);
+      confetti();
+    }
+  });
+  save();
+  document.getElementById('s-badges').textContent=ST.unlockedBadges.length;
+}
+
+function renderWins(){
+  document.getElementById('win-hrs').textContent=Math.floor(ST.totalHours);
+  document.getElementById('win-qs').textContent=ST.totalQs;
+  document.getElementById('win-days').textContent=ST.logCount;
+
+  drawChart();
+
+  const grid=document.getElementById('badge-grid');
+  grid.innerHTML=BADGES.map(b=>{
+    const u=ST.unlockedBadges.includes(b.id);
+    return `<div class="badge-card ${u?'unlocked':'locked'} fade-up">
+      <div class="badge-ico">${b.ico}</div>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-desc">${b.desc}</div>
+      ${u?'<div style="margin-top:6px"><span class="pill pill-gold">Unlocked ✓</span></div>':''}
+    </div>`;
+  }).join('');
+}
+
+function drawChart(){
+  const canvas=document.getElementById('mood-chart');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const last7=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const ds=d.toDateString();
+    const entries=ST.logs.filter(l=>new Date(l.date).toDateString()===ds);
+    last7.push({day:['S','M','T','W','T','F','S'][d.getDay()],hours:entries.reduce((s,e)=>s+(e.hours||0),0)});
+  }
+  const maxH=Math.max(...last7.map(d=>d.hours),1);
+  const bw=30,gap=(W-bw*7)/8;
+
+  last7.forEach((d,i)=>{
+    const x=gap+i*(bw+gap);
+    const bh=Math.max((d.hours/maxH)*(H-30),d.hours>0?4:0);
+    const y=H-20-bh;
+    ctx.fillStyle=d.hours>0?'rgba(59,142,232,0.25)':'rgba(255,255,255,0.04)';
+    ctx.beginPath();ctx.roundRect(x,y,bw,bh,4);ctx.fill();
+    if(d.hours>0){
+      ctx.fillStyle='#7ab8f5';
+      ctx.beginPath();ctx.roundRect(x,y,bw,3,2);ctx.fill();
+      ctx.fillStyle='#7ab8f5';ctx.font='9px DM Sans,sans-serif';ctx.textAlign='center';
+      ctx.fillText(d.hours+'h',x+bw/2,y-4);
+    }
+    ctx.fillStyle=d.hours>0?'#f8faff':'#8ba4c8';
+    ctx.font='10px DM Sans,sans-serif';ctx.textAlign='center';
+    ctx.fillText(d.day,x+bw/2,H-4);
+  });
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+function timerToggle(){
+  if(ST.timerRunning){
+    clearInterval(_timerInt);_timerInt=null;ST.timerRunning=false;
+    document.getElementById('tbtn-play').textContent='▶ Start';
+    document.getElementById('tbtn-play').className='tbtn play';
+  }else{
+    ST.timerRunning=true;
+    document.getElementById('tbtn-play').textContent='⏸ Pause';
+    document.getElementById('tbtn-play').className='tbtn stop';
+    _timerInt=setInterval(()=>{ST.timerSecs++;updateTimerUI();},1000);
+  }
+}
+function timerReset(){
+  clearInterval(_timerInt);_timerInt=null;ST.timerRunning=false;ST.timerSecs=0;
+  document.getElementById('tbtn-play').textContent='▶ Start';
+  document.getElementById('tbtn-play').className='tbtn play';
+  updateTimerUI();
+}
+function updateTimerUI(){
+  const s=ST.timerSecs;
+  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
+  document.getElementById('timer-disp').textContent=pad(h)+':'+pad(m)+':'+pad(sec);
+  const th=s/3600;
+  document.getElementById('session-hrs').textContent=Math.floor(th)+'h '+Math.floor((th%1)*60)+'m';
+}
+function pad(n){return n<10?'0'+n:n;}
+
+// ============================================================
+// MINI GAME
+// ============================================================
+let _gState={qIdx:0,score:0,answered:false};
+
+function launchGame(){
+  document.getElementById('milestone-banner').style.display='none';
+  _gState={qIdx:0,score:0,answered:false};
+  renderGameQ();
+}
+function renderGameQ(){
+  const wrap=document.getElementById('game-wrap');
+  const q=QUIZ[_gState.qIdx];
+  wrap.innerHTML=`<div class="game-overlay">
+    <div style="width:100%;max-width:360px">
+      <div style="text-align:center;margin-bottom:20px">
+        <span class="pill pill-gold">🎮 Milestone Quiz</span>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted)">Q ${_gState.qIdx+1} / ${QUIZ.length}</div>
+        <div style="height:4px;background:rgba(255,255,255,0.07);border-radius:99px;margin-top:10px">
+          <div style="height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue2),var(--skylight));width:${(_gState.qIdx/QUIZ.length)*100}%;transition:width 0.4s"></div>
+        </div>
+      </div>
+      <div class="game-q-card">${q.q}</div>
+      <div>${q.o.map((o,i)=>`<button class="game-opt" id="go${i}" onclick="answerQ(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>
+      <button class="btn ghost" style="margin-top:14px" onclick="closeGame()">✕ Exit Quiz</button>
+    </div>
+  </div>`;
+  wrap.style.display='block';
+}
+function answerQ(chosen){
+  if(_gState.answered)return;
+  _gState.answered=true;
+  const ans=QUIZ[_gState.qIdx].a;
+  document.getElementById('go'+chosen).classList.add(chosen===ans?'correct':'wrong');
+  if(chosen===ans)_gState.score++;
+  else document.getElementById('go'+ans).classList.add('correct');
+  setTimeout(()=>{
+    _gState.qIdx++;_gState.answered=false;
+    if(_gState.qIdx<QUIZ.length)renderGameQ();
+    else showGameResult();
+  },900);
+}
+function showGameResult(){
+  const pct=Math.round((_gState.score/QUIZ.length)*100);
+  const ico=pct>=80?'🏆':pct>=60?'⭐':'📖';
+  const msg=pct>=80?'Outstanding! 🔥':pct>=60?'Solid Work! 💪':'Keep studying! 📚';
+  const wrap=document.getElementById('game-wrap');
+  wrap.innerHTML=`<div class="game-overlay">
+    <div style="text-align:center;max-width:300px">
+      <div style="font-size:56px;margin-bottom:16px">${ico}</div>
+      <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:900;margin-bottom:6px">${msg}</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:24px">Quiz complete · Reward claimed</div>
+      <div style="font-size:52px;font-weight:900;font-family:'Playfair Display',serif;color:var(--accent)">${_gState.score}/${QUIZ.length}</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:28px">${pct}% correct</div>
+      <button class="btn accent" onclick="closeGame();confetti()">Claim Reward 🎉</button>
+      <button class="btn ghost" style="margin-top:8px" onclick="launchGame()">Play Again ↺</button>
+    </div>
+  </div>`;
+  confetti();
+}
+function closeGame(){
+  document.getElementById('game-wrap').style.display='none';
+  document.getElementById('game-wrap').innerHTML='';
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+function confetti(){
+  const cols=['#3b8ee8','#7ab8f5','#fbbf24','#22d3a0','#a78bfa','#f8faff','#f59e0b'];
+  for(let i=0;i<50;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${cols[~~(Math.random()*cols.length)]};
+      animation-delay:${Math.random()*0.8}s;animation-duration:${1.5+Math.random()*1.5}s;
+      width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),3500);
+  }
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+load();
+refreshHome();
+renderTopicsGrid();
+</script>
+</body>
+</html>
